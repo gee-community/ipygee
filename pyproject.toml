@@ -21,7 +21,8 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-  "deprecated>=1.2.14"
+  "deprecated>=1.2.14",
+  "earthengine-api",
 ]
 
 [[project.authors]]
@@ -43,14 +44,16 @@ test = [
   "pytest",
   "pytest-sugar",
   "pytest-cov",
-  "pytest-deadfixtures"
+  "pytest-deadfixtures",
+  "httplib2",
 ]
 doc = [
   "sphinx>=6.2.1",
   "pydata-sphinx-theme",
   "sphinx-copybutton",
   "sphinx-design",
-  "sphinx-autoapi"
+  "sphinx-autoapi",
+  "httplib2",
 ]
 
 [tool.hatch.build.targets.wheel]
