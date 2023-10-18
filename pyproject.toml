@@ -53,6 +53,7 @@ doc = [
   "sphinx-copybutton",
   "sphinx-design",
   "sphinx-autoapi",
+  "jupyter-sphinx",
   "httplib2",
 ]
 
