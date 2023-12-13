@@ -46,6 +46,7 @@ test = [
   "pytest-cov",
   "pytest-deadfixtures",
   "httplib2",
+  "pytest-gee",
 ]
 doc = [
   "sphinx>=6.2.1",
