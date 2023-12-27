@@ -55,7 +55,7 @@ html_theme_options = {
     ],
 }
 html_context = {
-    "github_user": "12rambau",
+    "github_user": "gee-community",
     "github_repo": "ipygee",
     "github_version": "",
     "doc_path": "docs",

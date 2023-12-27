@@ -37,7 +37,7 @@ file = "README.rst"
 content-type = "text/x-rst"
 
 [project.urls]
-Homepage = "https://github.com/12rambau/ipygee"
+Homepage = "https://github.com/gee-community/ipygee"
 
 [project.optional-dependencies]
 test = [
