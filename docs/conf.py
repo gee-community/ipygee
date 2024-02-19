@@ -71,6 +71,7 @@ autoapi_member_order = "groupwise"
 # -- Options for intersphinx output --------------------------------------------
 intersphinx_mapping = {}
 
+
 # -- Script to authenticate to Earthengine using a token -----------------------
 def gee_configure() -> None:
     """Initialize earth engine according to the environment.
