@@ -12,13 +12,13 @@ from google.cloud.resourcemanager import ProjectsClient
 from natsort import humansorted
 
 ICON_STYLE = {
-    "PARENT": {"color": "primary", "icon": "mdi-folder-open"},
-    "PROJECT": {"color": "primary", "icon": "mdi-google-cloud"},
-    "FOLDER": {"color": "primary", "icon": "mdi-folder"},
-    "IMAGE": {"color": "primary", "icon": "mdi-image-outline"},
-    "IMAGE_COLLECTION": {"color": "primary", "icon": "mdi-image-multiple-outline"},
-    "TABLE": {"color": "primary", "icon": "mdi-table"},
-    "FEATURE_COLLECTION": {"color": "primary", "icon": "mdi-tabe"},
+    "PARENT": {"color": "black", "icon": "mdi-folder-open"},
+    "PROJECT": {"color": "red", "icon": "mdi-google-cloud"},
+    "FOLDER": {"color": "grey", "icon": "mdi-folder"},
+    "IMAGE": {"color": "purple", "icon": "mdi-image-outline"},
+    "IMAGE_COLLECTION": {"color": "purple", "icon": "mdi-image-multiple-outline"},
+    "TABLE": {"color": "green", "icon": "mdi-table"},
+    "FEATURE_COLLECTION": {"color": "green", "icon": "mdi-tabe"},
 }
 "The style to apply to each object"
 
