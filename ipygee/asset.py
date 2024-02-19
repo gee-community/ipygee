@@ -10,6 +10,8 @@ import traitlets as t
 from google.cloud.resourcemanager import ProjectsClient
 from natsort import humansorted
 
+from .decorator import switch
+
 ICON_STYLE = {
     "PARENT": {"color": "black", "icon": "mdi-folder-open"},
     "PROJECT": {"color": "red", "icon": "mdi-google-cloud"},
@@ -55,6 +57,11 @@ class AssetManager(v.Flex):
 
     def __init__(self):
         """Initialize the class."""
+        # start with the loading bar
+        self.w_loading = self.loading = v.ProgressLinear(
+            indeterminate=False, color="primary", background_color="white"
+        )
+
         # add a line of buttons to reload and add new projects
         self.w_new = v.Btn(color="error", children="NEW", elevation=2, class_="ma-1")
         self.w_reload = v.Btn(
@@ -73,7 +80,7 @@ class AssetManager(v.Flex):
         self.w_list = v.List(dense=True, flat=True, v_model=True, children=[w_group])
 
         super().__init__(
-            children=[w_line, self.w_selected, self.w_list],
+            children=[self.w_loading, w_line, self.w_selected, self.w_list],
             v_model="",
         )
 
@@ -134,6 +141,7 @@ class AssetManager(v.Flex):
         # return the concatenation of the 2 lists
         return folder_list + file_list
 
+    @switch("indeterminate", member="w_loading")
     def on_item_select(self, change: dict):
         """Act when an item is clicked by the user."""
         # exit if nothing is changed to avoid infinite loop upon loading
@@ -149,5 +157,5 @@ class AssetManager(v.Flex):
         ee.Asset(change["new"])
         if selected == "." or ee.Asset(selected).is_project() or ee.Asset(selected).is_folder():
             self.folder = selected
-            self.w_list.children[0].cildren = []
+            self.w_list.children[0].children = []
             self.w_list.children[0].children = self.get_items()
