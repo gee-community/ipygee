@@ -84,6 +84,7 @@ class AssetManager(v.Flex):
         # add JS behaviour
         t.link((self, "selected_item"), (self, "v_model"))
         self.w_list.children[0].observe(self.on_item_select, "v_model")
+        self.w_reload.on_event("click", self.on_reload)
 
     def get_items(self) -> List[v.ListItem]:
         """Create the list of items inside a folder."""
@@ -157,3 +158,7 @@ class AssetManager(v.Flex):
             items = self.get_items()
             self.w_list.children[0].children = []  # trick to scroll up
             self.w_list.children[0].children = items
+
+    def on_reload(self, *args):
+        """Reload the current folder."""
+        self.on_item_select(change={"new": self.folder})
