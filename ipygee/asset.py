@@ -49,19 +49,14 @@ class AssetManager(v.Flex):
     w_selected: Optional[v.TextField] = None
     "The field where the user can see the asset Id of the selected item"
 
-    w_loading: Optional[v.ProgressLinear] = None
-    "Loading topbar of the widget"
-
     w_list: Optional[v.List] = None
     "The list of items displayed in the asset manager"
 
+    w_card: Optional[v.Card] = None
+    "The card hosting the list of items"
+
     def __init__(self):
         """Initialize the class."""
-        # start with the loading bar
-        self.w_loading = self.loading = v.ProgressLinear(
-            indeterminate=False, color="primary", background_color="white"
-        )
-
         # add a line of buttons to reload and add new projects
         self.w_new = v.Btn(color="error", children="NEW", elevation=2, class_="ma-1")
         self.w_reload = v.Btn(
@@ -73,14 +68,16 @@ class AssetManager(v.Flex):
         w_line = v.Flex(children=[self.w_new, self.w_reload, self.w_search], class_="pa-3")
 
         # generate the asset selector
-        self.w_selected = v.TextField(readonly=True, placeholder="Selected item", v_model="")
+        self.w_selected = v.TextField(
+            readonly=True, placeholder="Selected item", v_model="", clearable=True, outlined=True
+        )
 
         # generate the initial list
         w_group = v.ListItemGroup(children=self.get_items(), v_model="")
-        self.w_list = v.List(dense=True, flat=True, v_model=True, children=[w_group])
-
+        self.w_list = v.List(dense=True, flat=True, v_model=True, children=[w_group], outlined=True)
+        self.w_card = v.Card(children=[self.w_list], outlined=True)
         super().__init__(
-            children=[self.w_loading, w_line, self.w_selected, self.w_list],
+            children=[w_line, self.w_selected, self.w_card],
             v_model="",
         )
 
@@ -141,7 +138,7 @@ class AssetManager(v.Flex):
         # return the concatenation of the 2 lists
         return folder_list + file_list
 
-    @switch("indeterminate", member="w_loading")
+    @switch("loading", "disabled", member="w_card")
     def on_item_select(self, change: dict):
         """Act when an item is clicked by the user."""
         # exit if nothing is changed to avoid infinite loop upon loading
@@ -157,5 +154,6 @@ class AssetManager(v.Flex):
         ee.Asset(change["new"])
         if selected == "." or ee.Asset(selected).is_project() or ee.Asset(selected).is_folder():
             self.folder = selected
-            self.w_list.children[0].children = []
-            self.w_list.children[0].children = self.get_items()
+            items = self.get_items()
+            self.w_list.children[0].children = []  # trick to scroll up
+            self.w_list.children[0].children = items
