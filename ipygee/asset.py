@@ -57,29 +57,32 @@ class AssetManager(v.Flex):
 
     def __init__(self):
         """Initialize the class."""
+        # start by defining al the widgets
+        # We deactivated the formatting to define each one of them on 1 single line
+        # fmt: off
+
         # add a line of buttons to reload and add new projects
         self.w_new = v.Btn(color="error", children="NEW", elevation=2, class_="ma-1")
-        self.w_reload = v.Btn(
-            children=[v.Icon(color="primary", children="mdi-reload")], elevation=2, class_="ma-1"
-        )
-        self.w_search = v.Btn(
-            children=[v.Icon(color="primary", children="mdi-magnify")], elevation=2, class_="ma-1"
-        )
-        w_line = v.Flex(children=[self.w_new, self.w_reload, self.w_search], class_="pa-3")
+        self.w_reload = v.Btn(children=[v.Icon(color="primary", children="mdi-reload")], elevation=2, class_="ma-1")
+        self.w_search = v.Btn(children=[v.Icon(color="primary", children="mdi-magnify")], elevation=2, class_="ma-1")
+        w_main_line = v.Flex(children=[self.w_new, self.w_reload, self.w_search])
 
-        # generate the asset selector
-        self.w_selected = v.TextField(
-            readonly=True, placeholder="Selected item", v_model="", clearable=True, outlined=True
-        )
+        # generate the asset selector and the CRUD buttons
+        self.w_selected = v.TextField(readonly=True, placeholder="Selected item", v_model="", clearable=True, outlined=True, class_="ma-1")
+        self.w_view = v.Btn(children=[v.Icon(color="primary", children="mdi-eye")])
+        self.w_copy = v.Btn(children=[v.Icon(color="primary", children="mdi-content-copy")])
+        self.w_move = v.Btn(children=[v.Icon(color="primary", children="mdi-file-move")])
+        self.w_delete = v.Btn(children=[v.Icon(color="primary", children="mdi-trash-can")])
+        w_btn_list = v.ItemGroup(class_="ma-1 v-btn-toggle",children=[self.w_view, self.w_copy, self.w_move, self.w_delete])
+        w_selected_line = v.Layout(row=True, children=[w_btn_list, self.w_selected], class_="ma-1")
 
         # generate the initial list
         w_group = v.ListItemGroup(children=self.get_items(), v_model="")
-        self.w_list = v.List(dense=True, flat=True, v_model=True, children=[w_group], outlined=True)
-        self.w_card = v.Card(children=[self.w_list], outlined=True)
-        super().__init__(
-            children=[w_line, self.w_selected, self.w_card],
-            v_model="",
-        )
+        self.w_list = v.List(dense=True, v_model=True, children=[w_group], outlined=True)
+        self.w_card = v.Card(children=[self.w_list], outlined=True, class_="ma-1")
+
+        super().__init__(children=[w_main_line, w_selected_line, self.w_card], v_model="", class_="ma-1")
+        # fmt: on
 
         # add JS behaviour
         t.link((self, "selected_item"), (self, "v_model"))
