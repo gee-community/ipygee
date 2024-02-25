@@ -23,6 +23,8 @@ requires-python = ">=3.8"
 dependencies = [
   "deprecated>=1.2.14",
   "earthengine-api",
+  "ipyvuetify",
+  "natsort",
 ]
 
 [[project.authors]]
@@ -37,7 +39,7 @@ file = "README.rst"
 content-type = "text/x-rst"
 
 [project.urls]
-Homepage = "https://github.com/12rambau/ipygee"
+Homepage = "https://github.com/gee-community/ipygee"
 
 [project.optional-dependencies]
 test = [
@@ -113,3 +115,6 @@ warn_redundant_casts = true
 
 [tool.licensecheck]
 using = "PEP631"
+
+[tool.black]
+line-length = 105 # super small margin for items that are 2 characters too long

@@ -38,11 +38,12 @@ repos:
       - id: doc8
         stages: [commit]
 
-  - repo: https://github.com/FHPythonUtils/LicenseCheck
-    rev: "2023.5.1"
-    hooks:
-      - id: licensecheck
-        stages: [commit]
+  # crash on ipyvuetify
+  #- repo: https://github.com/FHPythonUtils/LicenseCheck
+  #  rev: "2023.5.1"
+  #  hooks:
+  #    - id: licensecheck
+  #      stages: [commit]
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.4
