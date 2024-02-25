@@ -1,7 +1,7 @@
 """The asset manager widget code and functionalities."""
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List
 
 import ee
 import geetools  # noqa
@@ -37,22 +37,22 @@ class AssetManager(v.Flex):
 
     # -- Widgets ---------------------------------------------------------------
 
-    w_new: Optional[v.Btn] = None
+    w_new: v.Btn
     "The new btn on the top of the asset manager"
 
-    w_reload: Optional[v.Btn] = None
+    w_reload: v.Btn
     "The reload btn at the top of the asset manager"
 
-    w_search: Optional[v.Btn] = None
+    w_search: v.Btn
     "The search button to crowl into the existing items"
 
-    w_selected: Optional[v.TextField] = None
+    w_selected: v.TextField
     "The field where the user can see the asset Id of the selected item"
 
-    w_list: Optional[v.List] = None
+    w_list: v.List
     "The list of items displayed in the asset manager"
 
-    w_card: Optional[v.Card] = None
+    w_card: v.Card
     "The card hosting the list of items"
 
     def __init__(self):
@@ -102,7 +102,7 @@ class AssetManager(v.Flex):
 
         # split the folders and the files to display the folders first
         # cloud bucket will be considered as folders
-        folder_list, file_list = [], []
+        folder_list, file_list = [], []  # type: ignore[var-annotated]
 
         # walk the list of items and generate a list of ListItem using all the appropriate features
         # first we extract the type to deduce the icon and color, then we build the Items with the
