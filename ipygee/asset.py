@@ -67,17 +67,17 @@ class AssetManager(v.Flex, HasSideCar):
         # fmt: off
 
         # add a line of buttons to reload and add new projects
-        self.w_new = v.Btn(color="error", children="NEW", elevation=2, class_="ma-1")
+        self.w_new = v.Btn(color="error", children="NEW", elevation=2, class_="ma-1", disabled=True)
         self.w_reload = v.Btn(children=[v.Icon(color="primary", children="mdi-reload")], elevation=2, class_="ma-1")
-        self.w_search = v.Btn(children=[v.Icon(color="primary", children="mdi-magnify")], elevation=2, class_="ma-1")
+        self.w_search = v.Btn(children=[v.Icon(color="primary", children="mdi-magnify")], elevation=2, class_="ma-1", disabled=True)
         w_main_line = v.Flex(children=[self.w_new, self.w_reload, self.w_search])
 
         # generate the asset selector and the CRUD buttons
         self.w_selected = v.TextField(readonly=True, placeholder="Selected item", v_model="", clearable=True, outlined=True, class_="ma-1")
-        self.w_view = v.Btn(children=[v.Icon(color="primary", children="mdi-eye")])
+        self.w_view = v.Btn(children=[v.Icon(color="primary", children="mdi-eye")], disabled=True)
         self.w_copy = v.Btn(children=[v.Icon(color="primary", children="mdi-content-copy")])
-        self.w_move = v.Btn(children=[v.Icon(color="primary", children="mdi-file-move")])
-        self.w_delete = v.Btn(children=[v.Icon(color="primary", children="mdi-trash-can")])
+        self.w_move = v.Btn(children=[v.Icon(color="primary", children="mdi-file-move")], disabled=True)
+        self.w_delete = v.Btn(children=[v.Icon(color="primary", children="mdi-trash-can")], disabled=True)
         w_btn_list = v.ItemGroup(class_="ma-1 v-btn-toggle",children=[self.w_view, self.w_copy, self.w_move, self.w_delete])
         w_selected_line = v.Layout(row=True, children=[w_btn_list, self.w_selected], class_="ma-1")
 
