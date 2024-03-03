@@ -69,6 +69,9 @@ class AssetManager(v.Flex, HasSideCar):
     w_asset_dialog: v.Dialog
     "The dialog to view an asset"
 
+    w_create_dialog: v.Dialog
+    "The dialog to create a new folder"
+
     def __init__(self):
         """Initialize the class."""
         # start by defining al the widgets
@@ -99,8 +102,12 @@ class AssetManager(v.Flex, HasSideCar):
         self.w_delete_dialog = DeleteAssetDialog()
         self.w_move_dialog = MoveAssetDialog()
         self.w_asset_dialog = AssetDialog()
+        self.w_create_dialog = CreateFolderDialog()
 
-        super().__init__(children=[self.w_delete_dialog, self.w_move_dialog, self.w_asset_dialog, w_main_line, w_selected_line, self.w_card], v_model="", class_="ma-1")
+        super().__init__(children=[
+            self.w_delete_dialog, self.w_move_dialog, self.w_asset_dialog, self.w_create_dialog,
+            w_main_line, w_selected_line, self.w_card
+        ], v_model="", class_="ma-1")
         # fmt: on
 
         # update the template of the DOM object to add a js method to copy to clipboard
@@ -118,6 +125,7 @@ class AssetManager(v.Flex, HasSideCar):
         self.w_selected.observe(self.activate_buttons, "v_model")
         self.w_move.on_event("click", self.on_move)
         self.w_view.on_event("click", self.on_view)
+        self.w_new.on_event("click", self.on_new)
 
     def get_items(self) -> List[v.ListItem]:
         """Create the list of items inside a folder."""
@@ -246,27 +254,44 @@ class AssetManager(v.Flex, HasSideCar):
         self.w_asset_dialog.reload(ee.Asset(selected))
         self.w_asset_dialog.value = True
 
+    @switch("loading", "disabled", member="w_card")
+    def on_new(self, *args):
+        """Create a new folder cia the dialog."""
+        # We need to be at least in a project to be able to create a new folder
+        selected = self.w_selected.v_model
+        if selected in [".", ""]:
+            return
+
+        self.w_create_dialog.reload(ee.Asset(self.folder))
+        self.w_create_dialog.value = True
+
     def activate_buttons(self, change: dict):
         """Activate the appropriate buttons whenever the selected item changes."""
         # reset everything
+        self.w_new.disabled = True
         self.w_view.disabled = True
         self.w_move.disabled = True
         self.w_delete.disabled = True
         self.w_copy.disabled = True
         self.w_copy.children[0].children = ["mdi-content-copy"]
 
-        # nothing is activated for projects and the root
-        if change["new"] in [".", ""] or ee.Asset(change["new"]).is_project():
+        # We can activate the new button for projects
+        asset = ee.Asset(change["new"])
+        if asset.is_absolute():
+            self.w_new.disabled = False
+
+        # we need to exit if the selected item is a project or a root
+        if change["new"] in [".", ""] or asset.is_project():
             return
 
         # reactivate delete move and copy for assets
-        if ee.Asset(change["new"]).exists():
+        if asset.exists():
             self.w_delete.disabled = False
             self.w_move.disabled = False
             self.w_copy.disabled = False
 
             # we can only view files
-            if not ee.Asset(change["new"]).is_folder():
+            if not asset.is_folder():
                 self.w_view.disabled = False
 
 
@@ -448,5 +473,71 @@ class AssetDialog(v.Dialog):
 
     @switch("loading", "disabled", member="w_card")
     def on_exit(self, *args):
+        """Exit without doing anything."""
+        self.value = False
+
+
+class CreateFolderDialog(v.Dialog):
+    """A dialog to create a new folder asset."""
+
+    # -- Variables -------------------------------------------------------------
+
+    folder: ee.Asset
+    "The current folder where to create the new folder."
+
+    # -- Widgets ---------------------------------------------------------------
+    w_asset: v.TextField
+    "The destination to move"
+
+    w_confirm: v.Btn
+    "The confirm button"
+
+    w_cancel: v.Btn
+    "The cancel button"
+
+    def __init__(self, asset: Optional[ee.Asset] = None):
+        """Initialize the class."""
+        # start by defining all the widgets
+        # fmt: off
+        self.w_asset = v.TextField(placeholder="Folder name", v_model="", clearable=True, outlined=True, class_="ma-1")
+        self.w_confirm = v.Btn(children=[v.Icon(children="mdi-check"), "Confirm"], color="primary")
+        self.w_cancel = v.Btn(children=[v.Icon(children=["mdi-times"]), "Cancel"])
+        w_title = v.CardTitle(children=["Create a new folder"])
+        w_content = v.CardText(children=[self.w_asset])
+        w_actions = v.CardActions(children=[v.Spacer(), self.w_cancel, self.w_confirm])
+        self.w_card = v.Card(children=[w_title, w_content, w_actions])
+        # fmt: on
+
+        super().__init__(children=[self.w_card], max_width="50%", persistent=True)
+
+        # js interaction with the btns
+        self.w_confirm.on_event("click", self.on_confirm)
+        self.w_cancel.on_event("click", self.on_cancel)
+
+    def reload(self, folder: ee.Asset):
+        """Reload the dialog with a new asset."""
+        # check the new destination is at least a project
+        if not ee.Asset(folder).is_absolute():
+            return
+
+        self.folder = folder
+        self.w_asset.prefix = f"{folder}/"
+        self.w_asset.v_model = ""
+
+    @switch("loading", "disabled", member="w_card")
+    def on_confirm(self, *args):
+        """Confirm the deletion."""
+        # remove the warnings
+        self.w_asset.error_messages = []
+
+        # crezte the folder and close the dialog
+        try:
+            (self.folder / self.w_asset.v_model).mkdir(exist_ok=True, parents=True)
+            self.value = False
+        except Exception as e:
+            self.w_asset.error_messages = [str(e)]
+
+    @switch("loading", "disabled", member="w_card")
+    def on_cancel(self, *args):
         """Exit without doing anything."""
         self.value = False
