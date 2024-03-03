@@ -1,6 +1,7 @@
 """The asset manager widget code and functionalities."""
 from __future__ import annotations
 
+from pathlib import Path
 from typing import List
 
 import ee
@@ -88,10 +89,17 @@ class AssetManager(v.Flex, HasSideCar):
         super().__init__(children=[w_main_line, w_selected_line, self.w_card], v_model="", class_="ma-1")
         # fmt: on
 
+        # update the template of the DOM object to add a js method to copy to clipboard
+        # template with js behaviour
+        js_dir = Path(__file__).parent / "js"
+        clip = (js_dir / "jupyter_clip.js").read_text()
+        self.template = "<mytf/>" "<script>{methods: {jupyter_clip(_txt) {%s}}}</script>" % clip
+
         # add JS behaviour
         t.link((self, "selected_item"), (self, "v_model"))
         self.w_list.children[0].observe(self.on_item_select, "v_model")
         self.w_reload.on_event("click", self.on_reload)
+        self.w_copy.on_event("click", self.on_copy)
 
     def get_items(self) -> List[v.ListItem]:
         """Create the list of items inside a folder."""
@@ -149,6 +157,9 @@ class AssetManager(v.Flex, HasSideCar):
     @switch("loading", "disabled", member="w_card")
     def on_item_select(self, change: dict):
         """Act when an item is clicked by the user."""
+        # reset the copy button status
+        self.w_copy.children[0].children = ["mdi-content-copy"]
+
         # exit if nothing is changed to avoid infinite loop upon loading
         selected = change["new"]
         if not selected:
@@ -169,3 +180,8 @@ class AssetManager(v.Flex, HasSideCar):
     def on_reload(self, *args):
         """Reload the current folder."""
         self.on_item_select(change={"new": self.folder})
+
+    def on_copy(self, *args):
+        """Copy the selected item to clipboard."""
+        self.send({"method": "clip", "args": [self.w_selected.v_model]})
+        self.w_copy.children[0].children = ["mdi-check"]
