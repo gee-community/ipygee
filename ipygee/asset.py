@@ -66,6 +66,9 @@ class AssetManager(v.Flex, HasSideCar):
     w_move_dialog: v.Dialog
     "The dialog to confirm the move of an asset"
 
+    w_asset_dialog: v.Dialog
+    "The dialog to view an asset"
+
     def __init__(self):
         """Initialize the class."""
         # start by defining al the widgets
@@ -95,8 +98,9 @@ class AssetManager(v.Flex, HasSideCar):
         # create the hidden dialogs
         self.w_delete_dialog = DeleteAssetDialog()
         self.w_move_dialog = MoveAssetDialog()
+        self.w_asset_dialog = AssetDialog()
 
-        super().__init__(children=[self.w_delete_dialog, self.w_move_dialog, w_main_line, w_selected_line, self.w_card], v_model="", class_="ma-1")
+        super().__init__(children=[self.w_delete_dialog, self.w_move_dialog, self.w_asset_dialog, w_main_line, w_selected_line, self.w_card], v_model="", class_="ma-1")
         # fmt: on
 
         # update the template of the DOM object to add a js method to copy to clipboard
@@ -113,6 +117,7 @@ class AssetManager(v.Flex, HasSideCar):
         self.w_delete.on_event("click", self.on_delete)
         self.w_selected.observe(self.activate_buttons, "v_model")
         self.w_move.on_event("click", self.on_move)
+        self.w_view.on_event("click", self.on_view)
 
     def get_items(self) -> List[v.ListItem]:
         """Create the list of items inside a folder."""
@@ -227,6 +232,19 @@ class AssetManager(v.Flex, HasSideCar):
         # open the delete dialog with the current file
         self.w_move_dialog.reload(ee.Asset(selected))
         self.w_move_dialog.value = True
+
+    @switch("loading", "disabled", member="w_card")
+    def on_view(self, *args):
+        """Open the view dialog."""
+        # make sure the current item is moveable. We can only move assets i.e.
+        # files and folders. Projects and buckets are not deletable.
+        selected = ee.Asset(self.w_selected.v_model)
+        if self.w_selected.v_model in [".", ""] or selected.is_project() or selected.is_folder():
+            return
+
+        # open the delete dialog with the current file
+        self.w_asset_dialog.reload(ee.Asset(selected))
+        self.w_asset_dialog.value = True
 
     def activate_buttons(self, change: dict):
         """Activate the appropriate buttons whenever the selected item changes."""
@@ -384,5 +402,51 @@ class MoveAssetDialog(v.Dialog):
 
     @switch("loading", "disabled", member="w_card")
     def on_cancel(self, *args):
+        """Exit without doing anything."""
+        self.value = False
+
+
+class AssetDialog(v.Dialog):
+    """A dialog to view an asset."""
+
+    # -- Variables -------------------------------------------------------------
+
+    asset: ee.Asset
+    "The asset to delete"
+
+    # -- Widgets ---------------------------------------------------------------
+
+    w_exit: v.Btn
+    "The exit button"
+
+    def __init__(self, asset: Optional[ee.Asset] = None):
+        """Initialize the class."""
+        # start by defining all the widgets
+        # fmt: off
+        self.w_exit = v.Btn(children=[v.Icon(children="mdi-check"), "Exit"])
+        self.w_title = v.CardTitle(children=["Delete the assets"])
+        w_content = v.CardText(children=[""])
+        w_actions = v.CardActions(children=[v.Spacer(), self.w_exit])
+        self.w_card = v.Card(children=[self.w_title, w_content, w_actions])
+        # fmt: on
+
+        super().__init__(children=[self.w_card], max_width="50%", persistent=True)
+
+        # js interaction with the btns
+        self.w_exit.on_event("click", self.on_exit)
+
+    def reload(self, asset: ee.Asset):
+        """Reload the dialog with a new asset."""
+        # We should never arrive here with a non asset
+        # but to avoid catastrophic destruction we will empty the list first
+        if asset is None or str(asset) == ".":
+            self.ul.children = []
+
+        # save the asset as a member and read it
+        self.asset = asset
+        self.w_title.children = [f"Viewing {asset.name}"]
+
+    @switch("loading", "disabled", member="w_card")
+    def on_exit(self, *args):
         """Exit without doing anything."""
         self.value = False
