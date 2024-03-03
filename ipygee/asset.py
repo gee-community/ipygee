@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import ee
 import geetools  # noqa
@@ -60,6 +60,9 @@ class AssetManager(v.Flex, HasSideCar):
     w_card: v.Card
     "The card hosting the list of items"
 
+    w_delete_dialog: v.Dialog
+    "The dialog to confirm the deletion of an asset"
+
     def __init__(self):
         """Initialize the class."""
         # start by defining al the widgets
@@ -77,7 +80,7 @@ class AssetManager(v.Flex, HasSideCar):
         self.w_view = v.Btn(children=[v.Icon(color="primary", children="mdi-eye")], disabled=True)
         self.w_copy = v.Btn(children=[v.Icon(color="primary", children="mdi-content-copy")])
         self.w_move = v.Btn(children=[v.Icon(color="primary", children="mdi-file-move")], disabled=True)
-        self.w_delete = v.Btn(children=[v.Icon(color="primary", children="mdi-trash-can")], disabled=True)
+        self.w_delete = v.Btn(children=[v.Icon(color="primary", children="mdi-trash-can")])
         w_btn_list = v.ItemGroup(class_="ma-1 v-btn-toggle",children=[self.w_view, self.w_copy, self.w_move, self.w_delete])
         w_selected_line = v.Layout(row=True, children=[w_btn_list, self.w_selected], class_="ma-1")
 
@@ -86,7 +89,10 @@ class AssetManager(v.Flex, HasSideCar):
         self.w_list = v.List(dense=True, v_model=True, children=[w_group], outlined=True)
         self.w_card = v.Card(children=[self.w_list], outlined=True, class_="ma-1")
 
-        super().__init__(children=[w_main_line, w_selected_line, self.w_card], v_model="", class_="ma-1")
+        # create the hidden dialogs
+        self.w_delete_dialog = DeleteASsetDialog()
+
+        super().__init__(children=[self.w_delete_dialog, w_main_line, w_selected_line, self.w_card], v_model="", class_="ma-1")
         # fmt: on
 
         # update the template of the DOM object to add a js method to copy to clipboard
@@ -100,6 +106,7 @@ class AssetManager(v.Flex, HasSideCar):
         self.w_list.children[0].observe(self.on_item_select, "v_model")
         self.w_reload.on_event("click", self.on_reload)
         self.w_copy.on_event("click", self.on_copy)
+        self.w_delete.on_event("click", self.on_delete)
 
     def get_items(self) -> List[v.ListItem]:
         """Create the list of items inside a folder."""
@@ -185,3 +192,84 @@ class AssetManager(v.Flex, HasSideCar):
         """Copy the selected item to clipboard."""
         self.send({"method": "clip", "args": [self.w_selected.v_model]})
         self.w_copy.children[0].children = ["mdi-check"]
+
+    @switch("loading", "disabled", member="w_card")
+    def on_delete(self, *args):
+        """Delete the selected item.
+
+        Ask for confirmation before deleting via a dialog window.
+        """
+        # make sure the current item is deletable. We can only delete assets i.e.
+        # files and folders. Projects and buckets are not deletable.
+        selected = self.w_selected.v_model
+        if selected in [".", ""] or ee.Asset(selected).is_project():
+            return
+
+        # open the delete dialog with the current file
+        self.w_delete_dialog.reload(ee.Asset(selected))
+        self.w_delete_dialog.value = True
+
+
+class DeleteASsetDialog(v.Dialog):
+    """A dialog to confirm the deletion of an asset."""
+
+    # -- Variables -------------------------------------------------------------
+
+    asset: ee.Asset
+    "The asset to delete"
+
+    # -- Widgets ---------------------------------------------------------------
+    w_confirm: v.Btn
+    "The confirm button"
+
+    w_cancel: v.Btn
+    "The cancel button"
+
+    def __init__(self, asset: Optional[ee.Asset] = None):
+        """Initialize the class."""
+        # start by defining all the widgets
+        self.w_confirm = v.Btn(children=[v.Icon(children="mdi-check"), "Confirm"], color="primary")
+        self.w_cancel = v.Btn(children=[v.Icon(children=["mdi-times"]), "Cancel"])
+        w_title = v.CardTitle(children=["Delete the assets"])
+        disclaimer = 'Clicking on "confirm" will definitively delete all the following asset. This action is definitive.'  # fmt: skip
+        option = 'Click on "cancel" to abort the deletion.'
+
+        self.ul = v.Html(tag="ul", children=[])
+        w_content = v.CardText(children=[disclaimer, option, self.ul])
+
+        w_actions = v.CardActions(children=[v.Spacer(), self.w_cancel, self.w_confirm])
+
+        self.w_card = v.Card(children=[w_title, w_content, w_actions])
+
+        super().__init__(children=[self.w_card], max_width="50%", persistent=True)
+
+        # js interaction with the btns
+        self.w_confirm.on_event("click", self.on_confirm)
+        self.w_cancel.on_event("click", self.on_cancel)
+
+    def reload(self, asset: ee.Asset):
+        """Reload the dialog with a new asset."""
+        # We should never arrive here with a non asset
+        # but to avoid catastrophic destruction we will empty the list first
+        if asset is None or str(asset) == ".":
+            self.ul.children = []
+
+        # save the asset as a member and read it
+        self.asset = asset
+        assets = asset.iterdir(recursive=True) if asset.is_folder() else [asset]
+        self.ul.children = [v.Html(tag="li", children=[str(a)]) for a in assets]
+
+    @switch("loading", "disabled", member="w_card")
+    def on_confirm(self, *args):
+        """Confirm the deletion."""
+        # delete the asset and close the dialog
+        if self.asset.is_folder():
+            self.asset.rmdir(recursive=True, dry_run=False)
+        else:
+            self.asset.delete()
+        self.value = False
+
+    @switch("loading", "disabled", member="w_card")
+    def on_cancel(self, *args):
+        """Exit without doing anything."""
+        self.value = False
