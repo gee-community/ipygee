@@ -26,6 +26,7 @@ dependencies = [
   "ipyvuetify",
   "natsort",
   "sidecar",
+  "geemap",
 ]
 
 [[project.authors]]
