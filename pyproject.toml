@@ -25,6 +25,8 @@ dependencies = [
   "earthengine-api",
   "ipyvuetify",
   "natsort",
+  "sidecar",
+  "geemap",
 ]
 
 [[project.authors]]

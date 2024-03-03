@@ -9,6 +9,7 @@ import ee
 import ipyvuetify as v
 
 from .decorator import switch
+from .sidecar import HasSideCar
 
 ICON_TYPE = {
     "EXPORT_IMAGE": "mdi-image-outline",
@@ -24,8 +25,13 @@ ICON_STATUS = {
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
-class TaskManager(v.Flex):
+class TaskManager(v.Flex, HasSideCar):
     """A task manager widget."""
+
+    # -- Variables -------------------------------------------------------------
+
+    sidecar_title = "Tasks"
+    "The title of the sidecar"
 
     # -- Widgets ---------------------------------------------------------------
 

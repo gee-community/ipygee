@@ -11,6 +11,7 @@ from google.cloud.resourcemanager import ProjectsClient
 from natsort import humansorted
 
 from .decorator import switch
+from .sidecar import HasSideCar
 
 ICON_STYLE = {
     "PARENT": {"color": "black", "icon": "mdi-folder-open"},
@@ -24,7 +25,7 @@ ICON_STYLE = {
 "The style to apply to each object"
 
 
-class AssetManager(v.Flex):
+class AssetManager(v.Flex, HasSideCar):
     """A asset manager widget."""
 
     # -- Variables -------------------------------------------------------------
@@ -34,6 +35,9 @@ class AssetManager(v.Flex):
 
     selected_item: t.Unicode = t.Unicode("").tag(sync=True)
     "The selected item of the asset manager"
+
+    sidecar_title = "Assets"
+    "The title of the sidecar"
 
     # -- Widgets ---------------------------------------------------------------
 
