@@ -107,6 +107,7 @@ class AssetManager(v.Flex, HasSideCar):
         self.w_reload.on_event("click", self.on_reload)
         self.w_copy.on_event("click", self.on_copy)
         self.w_delete.on_event("click", self.on_delete)
+        self.w_selected.observe(self.activate_buttons, "v_model")
 
     def get_items(self) -> List[v.ListItem]:
         """Create the list of items inside a folder."""
@@ -164,9 +165,6 @@ class AssetManager(v.Flex, HasSideCar):
     @switch("loading", "disabled", member="w_card")
     def on_item_select(self, change: dict):
         """Act when an item is clicked by the user."""
-        # reset the copy button status
-        self.w_copy.children[0].children = ["mdi-content-copy"]
-
         # exit if nothing is changed to avoid infinite loop upon loading
         selected = change["new"]
         if not selected:
@@ -208,6 +206,29 @@ class AssetManager(v.Flex, HasSideCar):
         # open the delete dialog with the current file
         self.w_delete_dialog.reload(ee.Asset(selected))
         self.w_delete_dialog.value = True
+
+    def activate_buttons(self, change: dict):
+        """Activate the appropriate buttons whenever the selected item changes."""
+        # reset everything
+        self.w_view.disabled = True
+        self.w_move.disabled = True
+        self.w_delete.disabled = True
+        self.w_copy.disabled = True
+        self.w_copy.children[0].children = ["mdi-content-copy"]
+
+        # nothing is activated for projects and the root
+        if change["new"] in [".", ""] or ee.Asset(change["new"]).is_project():
+            return
+
+        # reactivate delete move and copy for assets
+        if ee.Asset(change["new"]).exists():
+            self.w_delete.disabled = False
+            self.w_move.disabled = False
+            self.w_copy.disabled = False
+
+            # we can only view files
+            if not ee.Asset(change["new"]).is_folder():
+                self.w_view.disabled = False
 
 
 class DeleteASsetDialog(v.Dialog):
