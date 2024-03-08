@@ -14,10 +14,10 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
 ]
 requires-python = ">=3.8"
 dependencies = [
@@ -87,6 +87,9 @@ version_files = [
 [tool.pytest.ini_options]
 testpaths = "tests"
 
+[tool.black]
+line-length = 105 # super small margin for items that are 2 characters too long
+
 [tool.ruff]
 ignore-init-module-imports = true
 fix = true
@@ -117,6 +120,3 @@ warn_redundant_casts = true
 
 [tool.licensecheck]
 using = "PEP631"
-
-[tool.black]
-line-length = 105 # super small margin for items that are 2 characters too long
