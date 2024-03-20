@@ -41,6 +41,10 @@ ipygee
 Overview
 --------
 
+.. image:: https://raw.githubusercontent.com/gee-community/geetools/logo/docs/_static/logo.svg
+    :width: 20%
+    :align: right
+
 widgets to interact with GEE API
 
 Credits

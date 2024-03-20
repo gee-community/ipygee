@@ -120,3 +120,6 @@ warn_redundant_casts = true
 
 [tool.licensecheck]
 using = "PEP631"
+
+[tool.codespell]
+skip = "**/*.ipynb,**/*.yml,**/*.svg"
