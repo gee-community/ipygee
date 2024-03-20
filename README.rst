@@ -41,7 +41,7 @@ ipygee
 Overview
 --------
 
-.. image:: https://raw.githubusercontent.com/gee-community/ipygee/logo/docs/_static/logo.svg
+.. image:: https://raw.githubusercontent.com/gee-community/ipygee/main/docs/_static/logo.svg
     :width: 20%
     :align: right
 
