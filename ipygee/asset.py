@@ -8,7 +8,8 @@ import ee
 import geetools  # noqa
 import ipyvuetify as v
 import traitlets as t
-from google.cloud.resourcemanager import ProjectsClient
+
+# from google.cloud.resourcemanager import ProjectsClient
 from natsort import humansorted
 
 from .decorator import switch
@@ -133,7 +134,9 @@ class AssetManager(v.Flex, HasSideCar):
         # because of the specific display of cloud projects we will store both the name and the id of everything as a dict
         # for all other item types it will simply be the Name
         if self.folder == ".":
-            list_items = [p.project_id for p in ProjectsClient().search_projects() if "earth-engine" in p.labels]  # fmt: skip
+            # to recode as a dedicated method without gcloud
+            # list_items = [p.project_id for p in ProjectsClient().search_projects() if "earth-engine" in p.labels]  # fmt: skip
+            list_items = []
             list_items = [{"id": f"projects/{i}/assets", "name": i} for i in list_items]
         else:
             list_items = [{"id": str(i), "name": i.name} for i in ee.Asset(self.folder).iterdir()]

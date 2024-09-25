@@ -27,6 +27,7 @@ dependencies = [
   "natsort",
   "sidecar",
   "geemap",
+  "geetools",
 ]
 
 [[project.authors]]
