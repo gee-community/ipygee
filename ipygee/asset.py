@@ -1,16 +1,16 @@
 """The asset manager widget code and functionalities."""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import List, Optional
-import json
 
 import ee
 import geetools  # noqa
 import ipyvuetify as v
+import requests
 import traitlets as t
 from natsort import humansorted
-import requests
 
 from .decorator import switch
 from .sidecar import HasSideCar
@@ -129,10 +129,9 @@ class AssetManager(v.Flex, HasSideCar):
         self.w_new.on_event("click", self.on_new)
 
     def get_projects(self) -> List:
-        """Get the list of project accessible from the authenticated user"""
-
+        """Get the list of project accessible from the authenticated user."""
         # recover the saved credentials of the user from the file system
-        creds = Path.home()/".config"/"earthengine"/"credentials"
+        creds = Path.home() / ".config" / "earthengine" / "credentials"
         creds = json.loads(creds.read_text())
 
         # get an authentication token for this very account and make requests to the Google
@@ -165,7 +164,7 @@ class AssetManager(v.Flex, HasSideCar):
             response = requests.get(url.format(p), headers=headers)
             if response.status_code == 200:
                 gee_projects.append(p)
-                
+
         return gee_projects
 
     def get_items(self) -> List[v.ListItem]:
