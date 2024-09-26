@@ -45,22 +45,22 @@ Overview
     :width: 20%
     :align: right
 
-This package provides interactive widgets object to interact with Google Earth engine from Python interactive environment. 
+This package provides interactive widgets object to interact with Google Earth engine from Python interactive environment.
 
 TODO
 ----
 
-This package is still a work in progress but beta testers are welcome. here are the diffrent object that I would like to see implemented in this package: 
+This package is still a work in progress but beta testers are welcome. here are the different object that I would like to see implemented in this package:
 
 - A very basic map with the most critical functions available (basically geemap core and that's all)
-- A Task manager widget reproducing all the task manager features (and more?) 
-- A asset manager to manipulate GEE assets in an interactive window 
-- A bokhe interface (pure python) for all the geetools ploting capabilites
-- A Map inspector (need the map first) 
+- A Task manager widget reproducing all the task manager features (and more?)
+- A asset manager to manipulate GEE assets in an interactive window
+- A bokhe interface (pure python) for all the geetools plotting capabilities
+- A Map inspector (need the map first)
 - A dataset Explorer (based on the geemap one but with an increased interactivity)
-- All should be wired to JupyterLab sidecar for now, other IDE support will be welcome 
-- A complete and easy to use documentation 
-- If possible some CI tests (complicated for UI) 
+- All should be wired to JupyterLab sidecar for now, other IDE support will be welcome
+- A complete and easy to use documentation
+- If possible some CI tests (complicated for UI)
 
 Credits
 -------
