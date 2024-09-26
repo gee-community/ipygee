@@ -1,14 +1,15 @@
 """The asset manager widget code and functionalities."""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import List, Optional
 
 import ee
 import geetools  # noqa
 import ipyvuetify as v
+import requests
 import traitlets as t
-from google.cloud.resourcemanager import ProjectsClient
 from natsort import humansorted
 
 from .decorator import switch
@@ -127,14 +128,52 @@ class AssetManager(v.Flex, HasSideCar):
         self.w_view.on_event("click", self.on_view)
         self.w_new.on_event("click", self.on_new)
 
+    def get_projects(self) -> List:
+        """Get the list of project accessible from the authenticated user."""
+        # recover the saved credentials of the user from the file system
+        credential_path = Path.home() / ".config" / "earthengine" / "credentials"
+        creds = json.loads(credential_path.read_text())
+
+        # get an authentication token for this very account and make requests to the Google
+        # REST API
+        url = "https://cloudresourcemanager.googleapis.com/v1/projects"
+        token_url = "https://oauth2.googleapis.com/token"
+        creds["grant_type"] = "refresh_token"
+        response = requests.post(token_url, data=creds)
+
+        if response.status_code == 200:
+            access_token = response.json().get("access_token")
+        else:
+            raise ValueError(f"Failed to retrieve access token: {response.text}")
+
+        # Define the API endpoint and headers and list all the projects available
+        cloud_resource_manager_url = "https://cloudresourcemanager.googleapis.com/v1/projects"
+        headers = {"Authorization": f"Bearer {access_token}"}
+        response = requests.get(cloud_resource_manager_url, headers=headers)
+
+        # Handle the response
+        if response.status_code == 200:
+            projects = [p["projectId"] for p in response.json()["projects"]]
+        else:
+            raise ValueError(f"API request failed: {response.text}")
+
+        # filter out the projects that are not compatible with GEE
+        url = "https://serviceusage.googleapis.com/v1/projects/{}/services/earthengine.googleapis.com"
+        gee_projects = []
+        for p in projects:
+            response = requests.get(url.format(p), headers=headers)
+            if response.status_code == 200:
+                gee_projects.append(p)
+
+        return gee_projects
+
     def get_items(self) -> List[v.ListItem]:
         """Create the list of items inside a folder."""
         # special case when we are at the root of everything
         # because of the specific display of cloud projects we will store both the name and the id of everything as a dict
         # for all other item types it will simply be the Name
         if self.folder == ".":
-            list_items = [p.project_id for p in ProjectsClient().search_projects() if "earth-engine" in p.labels]  # fmt: skip
-            list_items = [{"id": f"projects/{i}/assets", "name": i} for i in list_items]
+            list_items = [{"id": f"projects/{i}/assets", "name": i} for i in self.get_projects()]
         else:
             list_items = [{"id": str(i), "name": i.name} for i in ee.Asset(self.folder).iterdir()]
 
