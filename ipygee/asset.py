@@ -131,8 +131,8 @@ class AssetManager(v.Flex, HasSideCar):
     def get_projects(self) -> List:
         """Get the list of project accessible from the authenticated user."""
         # recover the saved credentials of the user from the file system
-        creds = Path.home() / ".config" / "earthengine" / "credentials"
-        creds = json.loads(creds.read_text())
+        credential_path = Path.home() / ".config" / "earthengine" / "credentials"
+        creds = json.loads(credential_path.read_text())
 
         # get an authentication token for this very account and make requests to the Google
         # REST API
