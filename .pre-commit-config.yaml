@@ -32,11 +32,12 @@ repos:
       - id: ruff
         stages: [commit]
 
-  - repo: https://github.com/PyCQA/doc8
-    rev: "v1.1.1"
-    hooks:
-      - id: doc8
-        stages: [commit]
+  # crash on windows
+  #- repo: https://github.com/PyCQA/doc8
+  #  rev: "v1.1.1"
+  #  hooks:
+  #    - id: doc8
+  #      stages: [commit]
 
   # crash on ipyvuetify
   #- repo: https://github.com/FHPythonUtils/LicenseCheck
