@@ -120,6 +120,7 @@ class AssetManager(v.Flex, HasSideCar):
         t.link((self, "selected_item"), (self, "v_model"))
         self.w_list.children[0].observe(self.on_item_select, "v_model")
         self.w_reload.on_event("click", self.on_reload)
+        self.w_delete_dialog.observe(self.on_reload, "value")
         self.w_copy.on_event("click", self.on_copy)
         self.w_delete.on_event("click", self.on_delete)
         self.w_selected.observe(self.activate_buttons, "v_model")
@@ -189,9 +190,7 @@ class AssetManager(v.Flex, HasSideCar):
             icon = ICON_STYLE[type]["icon"]
             color = ICON_STYLE[type]["color"]
 
-            action = v.ListItemAction(
-                children=[v.Icon(color=color, small=True, children=[icon])], class_="mr-1"
-            )
+            action = v.ListItemAction(children=[v.Icon(color=color, small=True, children=[icon])], class_="mr-1")
             content = v.ListItemContent(children=[v.ListItemTitle(children=[i["name"]])])
             dst_list = folder_list if type in ["FOLDER", "PROJECT"] else file_list
             dst_list.append(v.ListItem(value=i["id"], children=[action, content]))
@@ -211,9 +210,7 @@ class AssetManager(v.Flex, HasSideCar):
             name = parent.parts[1] if parent.is_project() else parent.name
             name = name or "."  # special case for the root
 
-            action = v.ListItemAction(
-                children=[v.Icon(color=color, small=True, children=[icon])], class_="mr-1"
-            )
+            action = v.ListItemAction(children=[v.Icon(color=color, small=True, children=[icon])], class_="mr-1")
             content = v.ListItemContent(children=[v.ListItemTitle(children=[name])])
             item = v.ListItem(value=str(parent), children=[action, content])
 
@@ -244,8 +241,11 @@ class AssetManager(v.Flex, HasSideCar):
 
     def on_reload(self, *args):
         """Reload the current folder."""
-        self.on_item_select(change={"new": self.folder})
-
+        try:
+            self.on_item_select(change={"new": self.folder})
+        except ValueError: 
+            self.on_item_select(change={"new": ee.Asset(self.folder).parent.as_posix()})
+        
     def on_copy(self, *args):
         """Copy the selected item to clipboard."""
         self.send({"method": "clip", "args": [self.w_selected.v_model]})
