@@ -80,19 +80,18 @@ class AssetManager(v.Flex, HasSideCar):
         # fmt: off
 
         # add a line of buttons to reload and add new projects
-        self.w_new = v.Btn(color="error", children="NEW", elevation=2, class_="ma-1", disabled=True)
-        self.w_reload = v.Btn(children=[v.Icon(color="primary", children="mdi-reload")], elevation=2, class_="ma-1")
-        self.w_search = v.Btn(children=[v.Icon(color="primary", children="mdi-magnify")], elevation=2, class_="ma-1", disabled=True)
+        self.w_new = v.Btn(color="error", children="NEW", elevation=2, class_="ml-1", disabled=True, small=True)
+        self.w_reload = v.Btn(children=[v.Icon(color="primary", children="mdi-reload", small=True)], elevation=2, class_="ma-1", small=True)
+        self.w_search = v.Btn(children=[v.Icon(color="primary", children="mdi-magnify", small=True)], elevation=2, class_="mr-1", disabled=True, small=True)
         w_main_line = v.Flex(children=[self.w_new, self.w_reload, self.w_search])
 
         # generate the asset selector and the CRUD buttons
-        self.w_selected = v.TextField(readonly=True, placeholder="Selected item", v_model="", clearable=True, outlined=True, class_="ma-1")
-        self.w_view = v.Btn(children=[v.Icon(color="primary", children="mdi-eye")], disabled=True)
-        self.w_copy = v.Btn(children=[v.Icon(color="primary", children="mdi-content-copy")], disabled=True)
-        self.w_move = v.Btn(children=[v.Icon(color="primary", children="mdi-file-move")], disabled=True)
-        self.w_delete = v.Btn(children=[v.Icon(color="primary", children="mdi-trash-can")], disabled=True)
+        self.w_selected = v.TextField(readonly=True, label="Selected item", v_model="", clearable=True, outlined=True, class_="mt-1")
+        self.w_view = v.Btn(children=[v.Icon(color="primary", children="mdi-eye", small=True)], disabled=True, small=True)
+        self.w_copy = v.Btn(children=[v.Icon(color="primary", children="mdi-content-copy", small=True)], disabled=True, small=True)
+        self.w_move = v.Btn(children=[v.Icon(color="primary", children="mdi-file-move", small=True)], disabled=True, small=True)
+        self.w_delete = v.Btn(children=[v.Icon(color="primary", children="mdi-trash-can", small=True)], disabled=True, small=True)
         w_btn_list = v.ItemGroup(class_="ma-1 v-btn-toggle",children=[self.w_view, self.w_copy, self.w_move, self.w_delete])
-        w_selected_line = v.Layout(row=True, children=[w_btn_list, self.w_selected], class_="ma-1")
 
         # generate the initial list
         w_group = v.ListItemGroup(children=self.get_items(), v_model="")
@@ -107,7 +106,7 @@ class AssetManager(v.Flex, HasSideCar):
 
         super().__init__(children=[
             self.w_delete_dialog, self.w_move_dialog, self.w_asset_dialog, self.w_create_dialog,
-            w_main_line, w_selected_line, self.w_card
+            w_main_line, w_btn_list, self.w_selected, self.w_card
         ], v_model="", class_="ma-1")
         # fmt: on
 
@@ -190,7 +189,7 @@ class AssetManager(v.Flex, HasSideCar):
             icon = ICON_STYLE[type]["icon"]
             color = ICON_STYLE[type]["color"]
 
-            action = v.ListItemAction(children=[v.Icon(color=color, children=[icon])], class_="mr-1")
+            action = v.ListItemAction(children=[v.Icon(color=color, small=True, children=[icon])], class_="mr-1")
             content = v.ListItemContent(children=[v.ListItemTitle(children=[i["name"]])])
             dst_list = folder_list if type in ["FOLDER", "PROJECT"] else file_list
             dst_list.append(v.ListItem(value=i["id"], children=[action, content]))
@@ -210,7 +209,7 @@ class AssetManager(v.Flex, HasSideCar):
             name = parent.parts[1] if parent.is_project() else parent.name
             name = name or "."  # special case for the root
 
-            action = v.ListItemAction(children=[v.Icon(color=color, children=[icon])], class_="mr-1")
+            action = v.ListItemAction(children=[v.Icon(color=color, small=True, children=[icon])], class_="mr-1")
             content = v.ListItemContent(children=[v.ListItemTitle(children=[name])])
             item = v.ListItem(value=str(parent), children=[action, content])
 
