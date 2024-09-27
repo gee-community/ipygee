@@ -189,7 +189,9 @@ class AssetManager(v.Flex, HasSideCar):
             icon = ICON_STYLE[type]["icon"]
             color = ICON_STYLE[type]["color"]
 
-            action = v.ListItemAction(children=[v.Icon(color=color, small=True, children=[icon])], class_="mr-1")
+            action = v.ListItemAction(
+                children=[v.Icon(color=color, small=True, children=[icon])], class_="mr-1"
+            )
             content = v.ListItemContent(children=[v.ListItemTitle(children=[i["name"]])])
             dst_list = folder_list if type in ["FOLDER", "PROJECT"] else file_list
             dst_list.append(v.ListItem(value=i["id"], children=[action, content]))
@@ -209,7 +211,9 @@ class AssetManager(v.Flex, HasSideCar):
             name = parent.parts[1] if parent.is_project() else parent.name
             name = name or "."  # special case for the root
 
-            action = v.ListItemAction(children=[v.Icon(color=color, small=True, children=[icon])], class_="mr-1")
+            action = v.ListItemAction(
+                children=[v.Icon(color=color, small=True, children=[icon])], class_="mr-1"
+            )
             content = v.ListItemContent(children=[v.ListItemTitle(children=[name])])
             item = v.ListItem(value=str(parent), children=[action, content])
 
