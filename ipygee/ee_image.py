@@ -57,27 +57,20 @@ class ImageAccessor:
             crsTransform: The list of CRS transform values. This is a row-major ordering of the 3x2 transform matrix. This option is mutually exclusive with 'scale', and replaces any transform already set on the projection.
             tileScale: A scaling factor between 0.1 and 16 used to adjust aggregation tile size; setting a larger tileScale (e.g., 2 or 4) uses smaller tiles and may enable computations that run out of memory with the default.
 
-
         Returns:
             The bokeh figure with the plot.
-
-        See Also:
-            - :docstring:`ee.Image.geetools.byRegions`
-            - :docstring:`ee.Image.geetools.byBands`
-            - :docstring:`ee.Image.geetools.plot_by_bands`
-            - :docstring:`ee.Image.geetools.plot_hist`
 
         Examples:
             .. code-block:: python
 
-                import ee, geetools
+                import ee, ipygee
 
                 ee.Initialize()
 
                 ecoregions = ee.FeatureCollection("projects/google/charts_feature_example").select(["label", "value","warm"])
                 normClim = ee.ImageCollection('OREGONSTATE/PRISM/Norm91m').toBands()
 
-                normClim.geetools.plot_by_regions(ecoregions, ee.Reducer.mean(), scale=10000)
+                normClim.bokeh.plot_by_regions(ecoregions, ee.Reducer.mean(), scale=10000)
         """
         # get the data from the server
         data = self._obj.geetools.byBands(
@@ -131,7 +124,6 @@ class ImageAccessor:
         If no ``bands`` are provided, all bands will be plotted.
         If no ``regionId`` are provided, the ``"system:index"`` property will be used.
 
-
         Warning:
             This method is client-side.
 
@@ -150,25 +142,19 @@ class ImageAccessor:
             tileScale: A scaling factor between 0.1 and 16 used to adjust aggregation tile size; setting a larger tileScale (e.g., 2 or 4) uses smaller tiles and may enable computations that run out of memory with the default.
 
         Returns:
-            The bokeh figure with the plot.
-
-        See Also:
-            - :docstring:`ee.Image.geetools.byRegions`
-            - :docstring:`ee.Image.geetools.byBands`
-            - :docstring:`ee.Image.geetools.plot_by_regions`
-            - :docstring:`ee.Image.geetools.plot_hist`
+            The bokeh figure with the plot
 
         Examples:
             .. code-block:: python
 
-                import ee, geetools
+                import ee, ipygee
 
                 ee.Initialize()
 
                 ecoregions = ee.FeatureCollection("projects/google/charts_feature_example").select(["label", "value","warm"])
                 normClim = ee.ImageCollection('OREGONSTATE/PRISM/Norm91m').toBands()
 
-                normClim.geetools.plot_by_bands(ecoregions, ee.Reducer.mean(), scale=10000)
+                normClim.bokeh.plot_by_bands(ecoregions, ee.Reducer.mean(), scale=10000)
         """
         # get the data from the server
         data = self._obj.geetools.byRegions(
@@ -239,22 +225,15 @@ class ImageAccessor:
         Returns:
             The bokeh figure with the plot.
 
-        See Also:
-            - :docstring:`ee.Image.geetools.byRegions`
-            - :docstring:`ee.Image.geetools.byBands`
-            - :docstring:`ee.Image.geetools.plot_by_bands`
-            - :docstring:`ee.Image.geetools.plot_by_regions`
-
-
         Examples:
             .. code-block:: python
 
-                import ee, geetools
+                import ee, ipygee
 
                 ee.Initialize()
 
                 normClim = ee.ImageCollection('OREGONSTATE/PRISM/Norm91m').toBands()
-                normClim.geetools.plot_hist()
+                normClim.bokeh.plot_hist()
         """
         # extract the bands from the image
         eeBands = ee.List(bands) if bands is not None else self._obj.bandNames()
@@ -313,5 +292,6 @@ class ImageAccessor:
         # customize the layout of the axis
         figure.yaxis.axis_label = "Count"
         figure.xgrid.grid_line_color = None
+        figure.outline_line_color = None
 
         return figure

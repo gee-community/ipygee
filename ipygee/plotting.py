@@ -4,8 +4,8 @@ from __future__ import annotations
 from datetime import datetime as dt
 from math import pi
 
-import bokeh
 import numpy as np
+from bokeh import plotting
 from matplotlib import pyplot as plt
 
 
@@ -14,10 +14,10 @@ def plot_data(
     data: dict,
     label_name: str,
     colors: list[str] | None = None,
-    figure: bokeh.plotting.figure | None = None,
+    figure: plotting.figure | None = None,
     ax: plt.Axes | None = None,
     **kwargs,
-) -> bokeh.plotting.figure:
+) -> plotting.figure:
     """Plotting mechanism used in all the plotting functions.
 
     It binds the bokeh capabilities with the data aggregated by different axes.
@@ -42,8 +42,7 @@ def plot_data(
         kwargs: Additional arguments from the ``figure`` chart type selected.
     """
     # define the ax if not provided by the user
-    if figure is None:
-        figure = bokeh.plotting.figure(match_aspect=True)
+    figure = plotting.figure(match_aspect=True) if figure is None else figure
 
     # gather the data from parameters
     labels = list(data.keys())
@@ -69,8 +68,8 @@ def plot_data(
             figure.scatter(x=ticker_values, y=list(data[label].values()), **kwargs)
         figure.xaxis.ticker = ticker_values
         figure.xaxis.major_label_overrides = {i: p for i, p in enumerate(props)}
-        figure.yaxis.axis_name = props[0] if len(props) == 1 else "Properties values"
-        figure.xaxis.axis_name = f"Features (labeled by {label_name})"
+        figure.yaxis.axis_label = props[0] if len(props) == 1 else "Properties values"
+        figure.xaxis.axis_label = f"Features (labeled by {label_name})"
         figure.xgrid.grid_line_color = None
 
     elif type == "fill_between":
