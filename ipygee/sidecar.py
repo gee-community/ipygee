@@ -1,4 +1,5 @@
 """A meta class to define DOM element that can be send to the sidecar."""
+
 from __future__ import annotations
 
 from IPython.display import display

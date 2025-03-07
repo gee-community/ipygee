@@ -1,4 +1,5 @@
 """Test the ipygee package."""
+
 import ee
 
 

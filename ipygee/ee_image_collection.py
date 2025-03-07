@@ -1,4 +1,5 @@
 """Toolbox for the :py:class:`ee.ImageCollection` class."""
+
 from __future__ import annotations
 
 from datetime import datetime as dt

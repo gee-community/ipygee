@@ -1,4 +1,5 @@
 """he task manager widget and functionalitites."""
+
 from __future__ import annotations
 
 from datetime import datetime as dt
@@ -78,7 +79,6 @@ class TaskManager(v.Flex, HasSideCar):
         # build the listItems from the information
         task_list = []
         for t in tasks:
-
             # build a dictionary of metadata for the expansion panel
             state = t["metadata"]["state"]
             metadata = {

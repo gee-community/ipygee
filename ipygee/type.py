@@ -1,4 +1,5 @@
-""""The different types created for this specific package."""
+"""The different types created for this specific package."""
+
 import os
 from pathlib import Path
 from typing import Union

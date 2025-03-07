@@ -48,7 +48,6 @@ Homepage = "https://github.com/gee-community/ipygee"
 [project.optional-dependencies]
 test = [
   "pytest",
-  "pytest-sugar",
   "pytest-cov",
   "pytest-deadfixtures",
   "httplib2",
@@ -71,7 +70,7 @@ only-include = ["ipygee"]
 dependencies = [
   "pre-commit",
   "commitizen",
-  "nox"
+  "nox[uv]"
 ]
 post-install-commands = ["pre-commit install"]
 
@@ -89,29 +88,29 @@ version_files = [
 [tool.pytest.ini_options]
 testpaths = "tests"
 
-[tool.black]
-line-length = 105 # super small margin for items that are 2 characters too long
-
 [tool.ruff]
-ignore-init-module-imports = true
+line-length = 105 # small margin for long lines
 fix = true
+
+[tool.ruff.lint]
 select = ["E", "F", "W", "I", "D", "RUF"]
 ignore = [
   "E501",  # line too long | Black take care of it
   "D212",  # Multi-line docstring | We use D213
+  "D101",  # Missing docstring in public class | We use D106
 ]
 
-[tool.ruff.flake8-quotes]
+[tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.ruff.lint.extend-per-file-ignores]
+"__init__.py" = ["F401"] # Unused import | We use it to expose API extension
 
 [tool.coverage.run]
 source = ["ipygee"]
-
-[tool.doc8]
-ignore = ["D001"] # we follow a 1 line = 1 paragraph style
 
 [tool.mypy]
 scripts_are_modules = true
