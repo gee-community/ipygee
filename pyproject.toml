@@ -27,6 +27,8 @@ dependencies = [
   "natsort",
   "sidecar",
   "geemap[core]",
+  "bokeh",
+  "jupyter_bokeh",
 ]
 
 [[project.authors]]
