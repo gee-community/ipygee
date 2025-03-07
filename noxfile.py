@@ -54,6 +54,7 @@ def docs(session):
 def mypy(session):
     """Run a mypy check of the lib."""
     session.install("mypy")
+    session.install("types-requests")
     test_files = session.posargs or ["ipygee"]
     session.run("mypy", *test_files)
 
