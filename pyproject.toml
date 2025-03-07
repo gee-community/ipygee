@@ -26,7 +26,7 @@ dependencies = [
   "ipyvuetify",
   "natsort",
   "sidecar",
-  "geemap",
+  "geemap[core]",
   "bokeh",
   "jupyter_bokeh",
 ]
