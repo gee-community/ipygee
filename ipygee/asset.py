@@ -1,4 +1,5 @@
 """The asset manager widget code and functionalities."""
+
 from __future__ import annotations
 
 import json

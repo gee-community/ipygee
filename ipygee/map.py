@@ -1,4 +1,5 @@
 """All the map related widgets and functions are here."""
+
 from __future__ import annotations
 
 from geemap import core

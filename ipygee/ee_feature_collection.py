@@ -1,4 +1,5 @@
 """Toolbox for the :py:class:`ee.FeatureCollection` class."""
+
 from __future__ import annotations
 
 import ee

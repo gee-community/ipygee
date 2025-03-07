@@ -2,6 +2,7 @@
 
 ported from https://github.com/12rambau/sepal_ui/blob/main/sepal_ui/scripts/decorator.py
 """
+
 from __future__ import annotations
 
 from functools import wraps
@@ -27,7 +28,6 @@ def switch(*params, member: Optional[str] = None, debug: bool = True) -> Any:
     def decorator_switch(func):
         @wraps(func)
         def wrapper_switch(self, *args, **kwargs):
-
             # set the widget to work with. if nothing is set it will be self
             widget = getattr(self, member) if member else self
 
