@@ -6,7 +6,11 @@ from math import pi
 
 import numpy as np
 from bokeh import plotting
+from bokeh.layouts import column
+from bokeh.models import RangeTool
+from bokeh.models.layouts import Column
 from matplotlib import pyplot as plt
+from matplotlib.colors import to_hex
 
 
 def plot_data(
@@ -17,7 +21,7 @@ def plot_data(
     figure: plotting.figure | None = None,
     ax: plt.Axes | None = None,
     **kwargs,
-) -> plotting.figure:
+) -> plotting.figure | Column:
     """Plotting mechanism used in all the plotting functions.
 
     It binds the bokeh capabilities with the data aggregated by different axes.
@@ -40,6 +44,9 @@ def plot_data(
         figure: The bokeh figure to use. If not provided, the plot will be sent to a new figure.
         ax: The matplotlib axis to use. If not provided, the plot will be sent to a new axis.
         kwargs: Additional arguments from the ``figure`` chart type selected.
+
+    Returns:
+        The bokeh figure or the column of figure for time series.
     """
     # define the ax if not provided by the user
     figure = plotting.figure(match_aspect=True) if figure is None else figure
@@ -48,6 +55,9 @@ def plot_data(
     labels = list(data.keys())
     props = list(data[labels[0]].keys())
     colors = colors if colors else plt.get_cmap("tab10").colors
+
+    # convert the colors to hexadecimal representation
+    colors = [to_hex(c) for c in colors]
 
     # draw the chart based on the type
     if type == "plot":
@@ -60,6 +70,8 @@ def plot_data(
         figure.yaxis.axis_label = props[0] if len(props) == 1 else "Properties values"
         figure.xaxis.axis_label = f"Features (labeled by {label_name})"
         figure.xgrid.grid_line_color = None
+        figure.outline_line_color = None
+        return figure
 
     elif type == "scatter":
         ticker_values = list(range(len(props)))
@@ -71,6 +83,8 @@ def plot_data(
         figure.yaxis.axis_label = props[0] if len(props) == 1 else "Properties values"
         figure.xaxis.axis_label = f"Features (labeled by {label_name})"
         figure.xgrid.grid_line_color = None
+        figure.outline_line_color = None
+        return figure
 
     elif type == "fill_between":
         ticker_values = list(range(len(props)))
@@ -85,6 +99,8 @@ def plot_data(
         figure.yaxis.axis_label = props[0] if len(props) == 1 else "Properties values"
         figure.xaxis.axis_label = f"Features (labeled by {label_name})"
         figure.xgrid.grid_line_color = None
+        figure.outline_line_color = None
+        return figure
 
     elif type == "bar":
         ticker_values = list(range(len(props)))
@@ -101,6 +117,8 @@ def plot_data(
             kwargs.update(legend_label=label, color=colors[i])
             figure.vbar(x=x + width * i, top=values, width=width - margin, **kwargs)
         figure.xgrid.grid_line_color = None
+        figure.outline_line_color = None
+        return figure
 
     elif type == "barh":
         y = np.arange(len(props))
@@ -114,6 +132,8 @@ def plot_data(
             kwargs.update(legend_label=label, color=colors[i])
             figure.hbar(y=y + height * i, right=values, height=height - margin, **kwargs)
         figure.ygrid.grid_line_color = None
+        figure.outline_line_color = None
+        return figure
 
     elif type == "stacked":
         for label in labels:
@@ -125,6 +145,7 @@ def plot_data(
         figure.xaxis.ticker = ticker_values
         figure.xaxis.major_label_overrides = {i: p for i, p in enumerate(props)}
         figure.xgrid.grid_line_color = None
+        return figure
 
     elif type == "pie":
         if len(labels) != 1:
@@ -141,6 +162,8 @@ def plot_data(
         figure.x_range.start, figure.y_range.start = -1.5, -1.5
         figure.x_range.end, figure.y_range.end = 1.5, 1.5
         figure.grid.grid_line_color = None
+        figure.outline_line_color = None
+        return figure
 
     elif type == "donut":
         if len(labels) != 1:
@@ -157,32 +180,60 @@ def plot_data(
         figure.x_range.start, figure.y_range.start = -1.5, -1.5
         figure.x_range.end, figure.y_range.end = 1.5, 1.5
         figure.grid.grid_line_color = None
+        figure.outline_line_color = None
+        return figure
 
     elif type == "date":
+        # get the original height and width
+        height, width = figure.height, figure.width
+
+        # create the 2 figures that will be displayed in the column
+        main = plotting.figure(
+            height=int(height * 0.8), width=width, x_axis_type="datetime", x_axis_location="above"
+        )
+        main.outline_line_color = None
+
+        # create the select item
+        select = plotting.figure(
+            height=int(height * 0.3),
+            width=width,
+            y_range=main.y_range,
+            x_axis_type="datetime",
+            y_axis_type=None,
+            tools="",
+        )
+        select.title.text = "Drag the middle and edges of the selection box to change the range above"
+        select.ygrid.grid_line_color = None
+        select.outline_line_color = None
+
+        # draw the curves on both figures
         for i, label in enumerate(labels):
-            kwargs["color"] = colors[i]
+            kwargs.update(color=colors[i], legend_label=label)
             x, y = list(data[label].keys()), list(data[label].values())
-            ax.plot(x, y, label=label, **kwargs)
-        ax.set_xlabel("Date")
+            main.line(x, y, color=colors[i], legend_label=label)
+            select.line(x, y, color=colors[i])
+
+        # add the range tool to the select figure
+        range_tool = RangeTool(x_range=main.x_range)
+        select.add_tools(range_tool)
+
+        return column(main, select)
 
     elif type == "doy":
         xmin, xmax = 366, 0  # inverted initialization to get the first iteration values
         for i, label in enumerate(labels):
-            kwargs["color"] = colors[i]
             x, y = list(data[label].keys()), list(data[label].values())
-            ax.plot(x, y, label=label, **kwargs)
-            ax.set_xlabel("Day of year")
-            dates = [dt(2023, i + 1, 1) for i in range(12)]
-            idates = [int(d.strftime("%j")) - 1 for d in dates]
-            ndates = [d.strftime("%B")[:3] for d in dates]
-            ax.set_xticks(idates, ndates)
+            figure.line(x, y, color=colors[i], legend_label=label)
             xmin, xmax = min(xmin, min(x)), max(xmax, max(x))
-        ax.set_xlim(xmin - 5, xmax + 5)
+        dates = [dt(2023, i + 1, 1) for i in range(12)]
+        idates = [int(d.strftime("%j")) - 1 for d in dates]
+        ndates = [d.strftime("%B")[:3] for d in dates]
+        figure.xaxis.ticker = idates
+        figure.xaxis.major_label_overrides = dict(zip(idates, ndates))
+        figure.xaxis.axis_label = "Day of year"
+        figure.x_range.start = xmin - 5
+        figure.x_range.end = xmax + 5
+        return figure
 
     else:
         raise ValueError(f"Type {type} is not (yet?) supported")
-
-    # final global layout edit
-    figure.outline_line_color = None
-
-    return figure

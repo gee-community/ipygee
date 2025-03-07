@@ -28,12 +28,12 @@ class ImageAccessor:
         regionId: str = "system:index",
         labels: list[str] | None = None,
         colors: list[str] | None = None,
-        figure: plotting.Figure | None = None,
+        figure: plotting.figure | None = None,
         scale: int = 10000,
         crs: str | None = None,
         crsTransform: list | None = None,
         tileScale: float = 1,
-    ) -> plotting.Figure:
+    ) -> plotting.figure:
         """Plot the reduced values for each region.
 
         Each region will be plotted using the ``regionId`` as x-axis label defaulting to "system:index" if not provided.
@@ -112,12 +112,12 @@ class ImageAccessor:
         regionId: str = "system:index",
         labels: list[str] | None = None,
         colors: list[str] | None = None,
-        figure: plotting.Figure | None = None,
+        figure: plotting.figure | None = None,
         scale: int = 10000,
         crs: str | None = None,
         crsTransform: list | None = None,
         tileScale: float = 1,
-    ) -> plotting.Figure:
+    ) -> plotting.figure:
         """Plot the reduced values for each band.
 
         Each band will be plotted using the ``labels`` as x-axis label defaulting to band names if not provided.
@@ -195,7 +195,7 @@ class ImageAccessor:
         labels: list[str] | None = None,
         colors: list[str] | None = None,
         precision: int = 2,
-        figure: plotting.Figure | None = None,
+        figure: plotting.figure | None = None,
         scale: int = 10000,
         crs: str | None = None,
         crsTransform: list | None = None,
@@ -203,7 +203,7 @@ class ImageAccessor:
         maxPixels: int = 10**7,
         tileScale: float = 1,
         **kwargs,
-    ) -> plotting.Figure:
+    ) -> plotting.figure:
         """Plot the histogram of the image bands.
 
         Parameters:

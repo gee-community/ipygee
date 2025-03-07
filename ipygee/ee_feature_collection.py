@@ -26,9 +26,9 @@ class FeatureCollectionAccessor:
         properties: list[str] | None = None,
         labels: list[str] | None = None,
         colors: list[str] | None = None,
-        figure: plotting.Figure | None = None,
+        figure: plotting.figure | None = None,
         **kwargs,
-    ) -> plotting.Figure:
+    ) -> plotting.figure:
         """Plot the values of a :py:class:`ee.FeatureCollection` by feature.
 
         Each feature property selected in properties will be plotted using the ``featureId`` as the x-axis.
@@ -46,12 +46,6 @@ class FeatureCollectionAccessor:
             colors: A list of colors to use for plotting the properties. If not provided, the default colors from the matplotlib library will be used.
             figure: The bokeh figure to plot the data on. If None, a new figure is created.
             kwargs: Additional arguments from the ``pyplot`` type selected.
-
-        See Also:
-            - :docstring:`ee.FeatureCollection.geetools.byFeatures`
-            - :docstring:`ee.FeatureCollection.geetools.plot_by_properties`
-            - :docstring:`ee.FeatureCollection.geetools.plot_hist`
-            - :docstring:`ee.FeatureCollection.geetools.plot`
 
         Examples:
             .. jupyter-execute::
@@ -156,10 +150,10 @@ class FeatureCollectionAccessor:
         self,
         property: str | ee.String,
         label: str = "",
-        figure: plotting.Figure | None = None,
+        figure: plotting.figure | None = None,
         color: str | None = None,
         **kwargs,
-    ) -> plotting.Figure:
+    ) -> plotting.figure:
         """Plot the histogram of a specific property.
 
         Warning:
