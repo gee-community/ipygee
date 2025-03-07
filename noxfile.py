@@ -21,7 +21,7 @@ def lint(session):
 @nox.session(reuse_venv=True, venv_backend="uv")
 def test(session):
     """Run the selected tests and report coverage in html."""
-    session.install("--reinstall-package", ".[test]")
+    session.install("--reinstall", ".[test]")
     test_files = session.posargs or ["tests"]
     session.run("pytest", "--cov", "--cov-report=html", *test_files)
 
@@ -29,14 +29,14 @@ def test(session):
 @nox.session(reuse_venv=True, name="ci-test", venv_backend="uv")
 def ci_test(session):
     """Run all the test and report coverage in xml."""
-    session.install("--reinstall-package", ".[test]")
+    session.install("--reinstall", ".[test]")
     session.run("pytest", "--cov", "--cov-report=xml")
 
 
 @nox.session(reuse_venv=True, name="dead-fixtures", venv_backend="uv")
 def dead_fixtures(session):
     """Check for dead fixtures within the tests."""
-    session.install("--reinstall-package", ".[test]")
+    session.install("--reinstall", ".[test]")
     session.run("pytest", "--dead-fixtures")
 
 
@@ -44,7 +44,7 @@ def dead_fixtures(session):
 def docs(session):
     """Build the documentation."""
     build = session.posargs.pop() if session.posargs else "html"
-    session.install("--reinstall-package", ".[doc]")
+    session.install("--reinstall", ".[doc]")
     dst, warn = f"docs/_build/{build}", "warnings.txt"
     session.run("sphinx-build", "-v", "-b", build, "docs", dst, "-w", warn)
     session.run("python", "tests/check_warnings.py")
